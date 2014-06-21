@@ -24,10 +24,9 @@ public class AnalyseWikipediaWorldCup {
             worldcupPagesRDD.foreach(s -> System.out.println(s._1));
         }
 
-        String files = "../data/wikipedia-pagecounts-days/pagecounts-*";
-        JavaRDD<String> file = sc
-                .textFile(files);
-        JavaPairRDD<String, Long> worldcupViewsRDD = file.map(line -> line.split(" "))
+        String worldcupViews = "../data/wikipedia-pagecounts-days/pagecounts-*";
+        JavaPairRDD<String, Long> worldcupViewsRDD = sc.textFile(worldcupViews)
+                .map(line -> line.split(" "))
                 .mapToPair(s -> new Tuple2<String, Long>(s[0] + " " + s[1].toLowerCase(), Long.parseLong(s[2])))
                 .reduceByKey((x, y) -> x + y);
 

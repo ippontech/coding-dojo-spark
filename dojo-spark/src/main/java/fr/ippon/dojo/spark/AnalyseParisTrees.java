@@ -12,8 +12,8 @@ public class AnalyseParisTrees {
                 .setMaster("local");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
-        String worldcupPages = "../data/paris-arbresalignementparis2010/arbresalignementparis2010.csv";
-        sc.textFile(worldcupPages)
+        String filename = "../data/paris-arbresalignementparis2010/arbresalignementparis2010.csv";
+        sc.textFile(filename)
                 .filter(s -> s.startsWith("geom_x_y") == false)
                 .map(line -> line.split(";"))
                 .filter(x -> x[3].equals("") == false)
