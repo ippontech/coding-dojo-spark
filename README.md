@@ -6,6 +6,7 @@
 * [Spark Programming Guide](http://spark.apache.org/docs/latest/programming-guide.html)
 * [Making Apache Spark Easier to Use in Java with Java 8](http://blog.cloudera.com/blog/2014/04/making-apache-spark-easier-to-use-in-java-with-java-8/)
 * [Spark Standalone Mode](http://spark.apache.org/docs/latest/spark-standalone.html)
+* [AMP Camp 3 hands-on exercises](http://ampcamp.berkeley.edu/3/exercises/)
 
 ## Données utilisées
 
