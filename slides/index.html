@@ -30,10 +30,10 @@ class: center, middle
 # Programme de la journée
 
 * Découvrir Spark
-* Monter un cluster en local
 * Manipuler des données
   * Open Data - Mairie de Paris
   * Wikipedia : page counts, articles
+* Monter un cluster en local
 * Découvrir Spark Streaming
 
 ---
@@ -41,7 +41,7 @@ class: center, middle
 # Déroulement
 
 * 3 sprints
-* Démo / rétro à la fin de chaque sprint
+* Démo + rétro à la fin de chaque sprint
 * En binômes, et on tourne
 
 
@@ -154,27 +154,6 @@ sc.textFile(".../wikipedia/pagecounts")
 
 ---
 
-# La VM
-
-* Ubuntu
-* Java 8
-* IntelliJ IDEA (/home/dojo/workspace/intellij-idea/bin/idea.sh)
-* Maven
-* Spark 1.0.0
-
-
-* DOJO_HOME = /home/dojo/workspace/coding-dojo-spark/dojo-spark
-* DATA_HOME = /home/dojo/workspace/coding-dojo-spark/data
-* SPARK_HOME = /home/dojo/workspace/spark-1.0.0-bin-hadoop2
-
-
-* User : dojo/dojo
-
-
-* **Ne pas toucher la touche Ctrl droite !**
-
----
-
 # Les données (1/4)
 
 ## Open Data Paris - Arbres alignements
@@ -220,6 +199,39 @@ L'export complet de Wikipedia version "en".
 
 ---
 
+# La VM
+
+* Ubuntu
+* Java 8
+* IntelliJ IDEA (/home/dojo/workspace/intellij-idea/bin/idea.sh)
+* Maven
+* Spark 1.0.0
+
+
+* DOJO_HOME = /home/dojo/workspace/coding-dojo-spark/dojo-spark
+* DATA_HOME = /home/dojo/workspace/coding-dojo-spark/data
+* SPARK_HOME = /home/dojo/workspace/spark-1.0.0-bin-hadoop2
+
+
+* User : dojo/dojo
+
+
+* **Ne pas toucher la touche Ctrl droite !**
+
+---
+
+# Cluster
+
+Plusieurs options
+
+* YARN
+* Mesos
+* Standalone
+  * Workers démarrés individuellement
+  * Workers démarrés par le master
+
+---
+
 # Cluster
 
 ## Démarrer le master
@@ -254,6 +266,62 @@ Sur le master :
 ```
 $SPARK_HOME/sbin/start_slaves.sh
 ```
+
+---
+
+# Soumettre un job
+
+Préparer l'exécuteur :
+
+```java
+SparkConf conf = new SparkConf()
+        .setAppName("...")
+        .setMaster("spark://192.168.1.10:7077")
+        .setJars(new String[]{PATH + "/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar"});
+```
+
+Préparer le JAR avec Maven :
+
+```
+mvn package
+```
+
+Distribuer le JAR sur les slaves :
+
+```
+scp $DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar 192.168.1.11:$DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar
+scp $DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar 192.168.1.12:$DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar
+```
+
+Soumettre un job (ici AnalyseWikipediaWorldCup) :
+
+```
+$SPARK_HOME/bin/spark-submit --class fr.ippon.dojo.spark.AnalyseWikipediaWorldCup --master spark://192.168.1.10:7077 --deploy-mode cluster $DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar
+```
+
+---
+
+# Spark Streaming
+
+* DStream : Discretized Streams
+* Découpe un flux continu en batches
+* DStream -> séquence de RDDs
+
+<img src="images/sparkstreaming1.png" width="100%">
+<img src="images/sparkstreaming2.png" width="100%">
+
+---
+
+# Spark Streaming
+
+Sources :
+
+* Kafka
+* Flume
+* HDFS
+* ZeroMQ
+* Twitter
+* ...
 
     </textarea>
     <script src="scripts/remark-latest.min.js" type="text/javascript">
