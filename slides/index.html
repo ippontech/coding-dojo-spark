@@ -21,19 +21,307 @@
 
 class: center, middle
 
-# Title
+# Open Coding Dojo
+
+# Apache Spark &amp; Open Data
 
 ---
 
-# Agenda
+# Programme de la journée
 
-1. Introduction
-2. Deep-dive
-3. ...
+* Découvrir Spark
+* Manipuler des données
+  * Open Data - Mairie de Paris
+  * Wikipedia : page counts, articles
+* Monter un cluster en local
+* Découvrir Spark Streaming
 
 ---
 
-# Introduction
+# Déroulement
+
+* 3 sprints
+* Démo + rétro à la fin de chaque sprint
+* En binômes, et on tourne
+
+
+* 9h30 - 10h30 : introduction
+* 10h30 - 12h30 : Spark en local
+* 12h30 - 14h00 : pause déjeuner
+* 14h00 - 16h00 : Spark en cluster
+* 16h00 - 18h00 : Spark Streaming
+
+---
+
+# Introduction à Hadoop
+
+HDFS :
+
+* Hadoop Distributed File System
+* Stockage distribué sur "commodity hardware"
+* Fault tolerant
+
+MapReduce
+
+* Framework pour traiter de larges volumes de données
+* Traitement parallèle
+* Fault tolerant
+
+---
+
+# MapReduce
+
+* map() : découpe le problème -> distribution sur les noeuds
+* reduce() : remonte les résultats
+
+<img src="images/mapreduce.png" width="80%">
+
+---
+
+# MapReduce - Exemple
+
+Word count
+
+* Découpage des fichiers par fragments de 64 Mo (framework)
+* Découpage des fragments par lignes (framework)
+* Découpage des lignes en mots (map)
+* Comptage des mots (reduce)
+  * Sur chaque noeud
+  * Puis sur un noeud pour le résultat final
+
+---
+
+# Hadoop
+
+* Ecriture des résultats intermédiaires sur HDFS
+
+<img src="images/hadoop.png" width="100%">
+
+---
+
+# Spark
+
+* Conserve les résultats intermédiaires en mémoire
+* Une étape peut être un map() ou un reduce() seul
+
+<img src="images/spark.png" width="100%">
+
+---
+
+# Spark
+
+RDD
+
+* Resilient Distributed Dataset
+* Abstraction, collection traitée en parallèle
+* Fault tolerant
+* Différentes sources :
+  * Fichier sur HDFS
+  * Fichier local
+  * Collection en mémoire
+  * S3
+  * ...
+
+---
+
+# Spark
+
+Transformations :
+
+* Pour manipuler un RDD et retourner un autre RDD
+* Lazy
+* Exemples : map(), filter()...
+
+Actions :
+
+* Effectue un calcul
+* Ne retourne pas nécessairement un RDD
+* Exemples : reduce(), count()
+
+---
+
+# Spark - Exemple
+
+```java
+sc.textFile(".../wikipedia/pagecounts")
+        .map(line -> line.split(" "))
+        .mapToPair(s -> new Tuple2<String, Long>(s[1], Long.parseLong(s[2])))
+        .reduceByKey((x, y) -> x + y)
+        .collect();
+```
+
+<img src="images/exemple.png" width="100%">
+
+---
+
+# Les données (1/4)
+
+## Open Data Paris - Arbres alignements
+
+* Les quelques 110 000 arbres d'alignements de Paris avec leur type et leur emplacement géographique.
+* Fichier CSV, un record par arbre.
+
+---
+
+# Les données (2/4)
+
+## Open Data Paris - Tonnage déchets bacs jaunes
+
+* Tableau croisé du tonnage des déchets en bacs jaunes, par arrondissement et par mois, sur l'année 2011.
+* Fichier CSV, un record par arrondissement, une colonne par mois.
+
+---
+
+# Les données (3/4)
+
+## Wikipedia Pagecounts
+
+Statistiques de pages vues :
+
+* par "projet Wikipedia"
+* aggrégées par heure
+* format : projet page nb_visites volume_donnees
+
+Deux datasets :
+
+* wikipedia-pagecounts-days : 5 fichiers de statistiques du dimanche à minuit
+* wikipedia-pagecounts-hours : les 24 fichiers d'une journée complète
+
+Source : [Page view statistics for Wikimedia projects](https://dumps.wikimedia.org/other/pagecounts-raw/)
+
+---
+
+# Les données (4/4)
+
+## Wikipedia Articles
+
+L'export complet de Wikipedia version "en".
+
+---
+
+# La VM
+
+* Ubuntu
+* Java 8
+* IntelliJ IDEA (/home/dojo/workspace/intellij-idea/bin/idea.sh)
+* Maven
+* Spark 1.0.0
+
+
+* DOJO_HOME = /home/dojo/workspace/coding-dojo-spark/dojo-spark
+* DATA_HOME = /home/dojo/workspace/coding-dojo-spark/data
+* SPARK_HOME = /home/dojo/workspace/spark-1.0.0-bin-hadoop2
+
+
+* User : dojo/dojo
+
+
+* **Ne pas toucher la touche Ctrl droite !**
+
+---
+
+# Cluster
+
+Plusieurs options
+
+* YARN
+* Mesos
+* Standalone
+  * Workers démarrés individuellement
+  * Workers démarrés par le master
+
+---
+
+# Cluster
+
+## Démarrer le master
+
+Sur le master :
+
+```
+export SPARK_MASTER_IP=192.168.1.10
+cd $SPARK_HOME/sbin/start-master.sh
+```
+
+Interface de supervision : http://192.168.1.10:8080
+
+---
+
+# Cluster
+
+## Déclarer les slaves
+
+Sur le master, éditer le fichier $SPARK_HOME/conf/slaves :
+
+```
+192.168.1.10
+192.168.1.11
+192.168.1.12
+```
+
+## Démarrer les slaves
+
+Sur le master :
+
+```
+$SPARK_HOME/sbin/start_slaves.sh
+```
+
+---
+
+# Soumettre un job
+
+Préparer l'exécuteur :
+
+```java
+SparkConf conf = new SparkConf()
+        .setAppName("...")
+        .setMaster("spark://192.168.1.10:7077")
+        .setJars(new String[]{PATH + "/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar"});
+```
+
+Préparer le JAR avec Maven :
+
+```
+mvn package
+```
+
+Distribuer le JAR sur les slaves :
+
+```
+scp $DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar 192.168.1.11:$DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar
+scp $DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar 192.168.1.12:$DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar
+```
+
+Soumettre un job (ici AnalyseWikipediaWorldCup) :
+
+```
+$SPARK_HOME/bin/spark-submit --class fr.ippon.dojo.spark.AnalyseWikipediaWorldCup --master spark://192.168.1.10:7077 --deploy-mode cluster $DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar
+```
+
+---
+
+# Spark Streaming
+
+* DStream : Discretized Streams
+* Découpe un flux continu en batches
+* DStream -> séquence de RDDs
+
+<img src="images/sparkstreaming1.png" width="100%">
+<img src="images/sparkstreaming2.png" width="100%">
+
+---
+
+# Spark Streaming
+
+Sources :
+
+* Kafka
+* Flume
+* HDFS
+* ZeroMQ
+* Twitter
+* ...
 
     </textarea>
     <script src="scripts/remark-latest.min.js" type="text/javascript">
