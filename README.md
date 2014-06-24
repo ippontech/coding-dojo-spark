@@ -91,8 +91,8 @@ Préparer le JAR avec Maven :
 
 Distribuer le JAR sur les slaves :
 
-    scp $DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar 192.168.1.11:$DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar
-    scp $DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar 192.168.1.12:$DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar
+    scp $DOJO_HOME/target/dojo-spark-0.0.1-SNAPSHOT.jar 192.168.1.11:$DOJO_HOME/target/dojo-spark-0.0.1-SNAPSHOT.jar
+    scp $DOJO_HOME/target/dojo-spark-0.0.1-SNAPSHOT.jar 192.168.1.12:$DOJO_HOME/target/dojo-spark-0.0.1-SNAPSHOT.jar
 
 Soumettre un job (ici AnalyseWikipediaWorldCup) :
 
