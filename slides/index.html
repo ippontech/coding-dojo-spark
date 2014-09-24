@@ -346,10 +346,10 @@ Préparer l'exécuteur :
 
 ```java
 SparkConf conf = new SparkConf()
-        .setAppName("...")
-        .setMaster("spark://192.168.1.10:7077")
-        .setJars(new String[]{PATH + "/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar"});
+        .setAppName("...");
 ```
+
+(Pas de .setMaster(...))
 
 Préparer le JAR avec Maven :
 
@@ -357,17 +357,21 @@ Préparer le JAR avec Maven :
 mvn package
 ```
 
-Distribuer le JAR sur les slaves :
+Distribuer le JAR sur HDFS :
 
 ```
-scp $DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar 192.168.1.11:$DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar
-scp $DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar 192.168.1.12:$DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar
+hdfs dfs -rm -f /dojo-spark-0.0.1-SNAPSHOT-yourname.jar
+hdfs dfs -put target/dojo-spark-0.0.1-SNAPSHOT.jar /dojo-spark-0.0.1-SNAPSHOT-yourname.jar
 ```
 
 Soumettre un job (ici AnalyseWikipediaWorldCup) :
 
 ```
-$SPARK_HOME/bin/spark-submit --class fr.ippon.dojo.spark.AnalyseWikipediaWorldCup --master spark://192.168.1.10:7077 --deploy-mode cluster $DOJO_HOME/dojo-spark/target/dojo-spark-0.0.1-SNAPSHOT.jar
+$SPARK_HOME/bin/spark-submit \
+  --class fr.ippon.dojo.spark.AnalyseWikipediaWorldCup \
+  --master spark://192.168.1.10:7077 \
+  --deploy-mode cluster \
+  hdfs://192.168.1.10:9000/jars/dojo-spark-0.0.1-SNAPSHOT-yourname.jar
 ```
 
 ---
