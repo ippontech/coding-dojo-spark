@@ -21,7 +21,7 @@ fi
 
 if [ -z "$SPARK_IP" ]
 then
-  echo 'Variable $SPARK_IP must be defined'
+  echo 'Variable $SPARK_MASTER_IP must be defined'
   exit 1
 fi
 
