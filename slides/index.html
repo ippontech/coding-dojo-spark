@@ -14,6 +14,11 @@
         font-weight: normal;
       }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .full { padding: 1em; }
+      .full h1 {
+        font-size: 30px;
+        margin: 0px 30px;
+      }
     </style>
   </head>
   <body>
@@ -21,7 +26,7 @@
 
 class: center, middle
 
-# Open Coding Dojo
+# Coding Dojo
 
 # Apache Spark &amp; Open Data
 
@@ -76,11 +81,22 @@ MapReduce
 
 <img src="images/mapreduce.png" width="80%">
 
+Manipulation de _tuples_ :
+
+* Clé - Valeur
+* Les tuples sont indépendants les uns des autres
+
 ---
 
-# MapReduce - Exemple
+# MapReduce - Exemples
 
-Word count
+* Analyse de logs
+* Recherche distribuée (Google, avant)
+* Traitement de fichiers texte
+
+---
+
+# Word count
 
 * Découpage des fichiers par fragments de 128 Mo (framework)
 * Découpage des fragments par lignes (framework)
@@ -91,9 +107,18 @@ Word count
 
 ---
 
+class: full
+
+# Word count - Shakespeare, Hamlet, acte III, scène 1
+
+<img src="images/wordcount.png" width="90%">
+
+---
+
 # Hadoop
 
 * Ecriture des résultats intermédiaires sur HDFS
+* Adapté aux traitements batches, pas au temps réel
 
 <img src="images/hadoop.png" width="100%">
 
@@ -102,7 +127,8 @@ Word count
 # Spark
 
 * Conserve les résultats intermédiaires en mémoire
-* Une étape peut être un map() ou un reduce() seul
+* Une étape peut être un _map_ seul (pas de _reduce_)
+* Peut manipuler des types simples (pas forcément que des tuples)
 
 <img src="images/spark.png" width="100%">
 
@@ -114,7 +140,7 @@ RDD
 
 * Resilient Distributed Dataset
 * Abstraction, collection traitée en parallèle
-* Fault tolerant
+* Tolérant à la panne
 * Différentes sources :
   * Fichier sur HDFS
   * Fichier local
@@ -129,18 +155,39 @@ RDD
 Transformations :
 
 * Pour manipuler un RDD et retourner un autre RDD
-* Lazy
-* Exemples : map(), filter()...
+* Lazy !
+* Exemples :
+ * _map()_ : reçoit une valeur, retourne une valeur
+ * _mapToPair()_ : reçoit une valeur, retourne un tuple
+ * _filter()_ : filtre les valeurs/tuples
+ * _groupByKey()_ : regroupe la valeurs par clés
+ * _reduceByKey()_ : aggrège les valeurs par clés avec une fonction d'aggrégation
+ * _join()_, _cogroup()_... : jointure entre deux RDD
 
-Actions :
+---
 
-* Effectue un calcul
-* Ne retourne pas nécessairement un RDD
-* Exemples : reduce(), count()
+# Spark
+
+Actions finales :
+
+* Ne retournent pas un RDD
+* Exemples :
+ * _count()_ : compte les valeurs/tuples
+ * _foreach()_ : exécute une fonction sur chaque valeur/tuple (utile pour le debug)
+ * _saveAsHadoopFile()_ : sauve les résultats au format Hadoop
+ * _collect()_ : récupère les valeurs dans une liste (List&lt; T &gt;)
 
 ---
 
 # Spark - Exemple
+
+```text
+...
+fr Ignifuge 1 17634
+fr Ignitron 1 9887
+fr Ignorance 4 56569
+...
+```
 
 ```java
 sc.textFile(".../wikipedia/pagecounts")
@@ -154,25 +201,67 @@ sc.textFile(".../wikipedia/pagecounts")
 
 ---
 
-# Les données (1/4)
+# Spark en Cluster
+
+Plusieurs options
+
+* YARN
+* Mesos
+* Standalone
+  * Workers démarrés individuellement
+  * Workers démarrés par le master
+
+---
+
+class: center, middle
+
+# La VM
+
+---
+
+# La VM
+
+* Ubuntu
+* Java 8
+* Eclipse (/home/dojo/workspace/eclipse)
+* Maven
+* Spark 1.1.0
+
+
+* DOJO_HOME = /home/dojo/workspace/coding-dojo-spark/dojo-spark
+* DATA_HOME = /home/dojo/workspace/coding-dojo-spark/data
+* SPARK_HOME = /home/dojo/workspace/spark-1.1.0-bin-hadoop2.4
+
+
+* User : dojo/dojo
+
+
+* **Ne pas toucher la touche Ctrl droite !**
+
+---
+
+class: center, middle
+
+# TP #1
+
+---
+
+# Use case #1
 
 ## Open Data Paris - Arbres alignements
 
 * Les quelques 110 000 arbres d'alignements de Paris avec leur type et leur emplacement géographique.
 * Fichier CSV, un record par arbre.
 
----
+**&rarr; Faire des analyses statistiques :**
 
-# Les données (2/4)
-
-## Open Data Paris - Tonnage déchets bacs jaunes
-
-* Tableau croisé du tonnage des déchets en bacs jaunes, par arrondissement et par mois, sur l'année 2011.
-* Fichier CSV, un record par arrondissement, une colonne par mois.
+* Compter le nombre d'arbres par type
+* Calculer la circonférence moyenne des arbres
+* ...
 
 ---
 
-# Les données (3/4)
+# Use case #2
 
 ## Wikipedia Pagecounts
 
@@ -184,39 +273,35 @@ Statistiques de pages vues :
 
 Deux datasets :
 
-* wikipedia-pagecounts-days : 5 fichiers de statistiques du dimanche à minuit
-* wikipedia-pagecounts-hours : les 24 fichiers d'une journée complète
+* _wikipedia-pagecounts-days_ : 5 fichiers de statistiques du dimanche à minuit
+* _wikipedia-pagecounts-hours_ : les 24 fichiers d'une journée complète
 
 Source : [Page view statistics for Wikimedia projects](https://dumps.wikimedia.org/other/pagecounts-raw/)
 
 ---
 
-# Les données (4/4)
+# Use case #2
 
-## Wikipedia Articles
+## Wikipedia Pagecounts
 
-L'export complet de Wikipedia version "en".
+**&rarr; Calculer le nombre de visite de la page "Coupe du Monde de Football" dans chaque pays**
+
+* _wikipedia_worldcup_pages_ : les noms des pages dans chaque langue
+* nécessité de croiser deux RDD
 
 ---
 
-# La VM
+class: center, middle
 
-* Ubuntu
-* Java 8
-* IntelliJ IDEA (/home/dojo/workspace/intellij-idea/bin/idea.sh)
-* Maven
-* Spark 1.0.2
+# TP #2
 
+---
 
-* DOJO_HOME = /home/dojo/workspace/coding-dojo-spark/dojo-spark
-* DATA_HOME = /home/dojo/workspace/coding-dojo-spark/data
-* SPARK_HOME = /home/dojo/workspace/spark-1.0.2-bin-hadoop2
+# Mise en cluster
 
-
-* User : dojo/dojo
-
-
-* **Ne pas toucher la touche Ctrl droite !**
+* Cluster HDFS
+* Cluster Spark
+ * En mode standalone
 
 ---
 
@@ -293,18 +378,6 @@ $ hdfs dfs -copyFromLocal wikipedia-pagecounts-days /data
 
 # Cluster Spark
 
-Plusieurs options
-
-* YARN
-* Mesos
-* Standalone
-  * Workers démarrés individuellement
-  * Workers démarrés par le master
-
----
-
-# Cluster Spark
-
 ## Démarrer le master
 
 Sur le master :
@@ -376,6 +449,20 @@ $SPARK_HOME/bin/spark-submit \
 
 ---
 
+class: center, middle
+
+# TP #3
+
+---
+
+# Au choix
+
+Spark Streaming
+
+Mesos
+
+---
+
 # Spark Streaming
 
 * DStream : Discretized Streams
@@ -397,6 +484,57 @@ Sources :
 * ZeroMQ
 * Twitter
 * ...
+
+---
+
+class: center, middle
+
+# Les données
+
+---
+
+# Les données (1/4)
+
+## Open Data Paris - Arbres alignements
+
+* Les quelques 110 000 arbres d'alignements de Paris avec leur type et leur emplacement géographique.
+* Fichier CSV, un record par arbre.
+
+---
+
+# Les données (2/4)
+
+## Open Data Paris - Tonnage déchets bacs jaunes
+
+* Tableau croisé du tonnage des déchets en bacs jaunes, par arrondissement et par mois, sur l'année 2011.
+* Fichier CSV, un record par arrondissement, une colonne par mois.
+
+---
+
+# Les données (3/4)
+
+## Wikipedia Pagecounts
+
+Statistiques de pages vues :
+
+* par "projet Wikipedia"
+* aggrégées par heure
+* format : projet page nb_visites volume_donnees
+
+Deux datasets :
+
+* wikipedia-pagecounts-days : 5 fichiers de statistiques du dimanche à minuit
+* wikipedia-pagecounts-hours : les 24 fichiers d'une journée complète
+
+Source : [Page view statistics for Wikimedia projects](https://dumps.wikimedia.org/other/pagecounts-raw/)
+
+---
+
+# Les données (4/4)
+
+## Wikipedia Articles
+
+L'export complet de Wikipedia version "en".
 
     </textarea>
     <script src="scripts/remark-latest.min.js" type="text/javascript">
