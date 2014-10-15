@@ -7,7 +7,7 @@ import twitter4j.auth.AuthorizationFactory;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationContext;
 
-public class AnalyseTweetsWorldCup {
+public class AnalyseTweetsAndroid {
     public static void main(String[] args) throws TwitterException, InterruptedException {
 
         Configuration twitterConf = ConfigurationContext.getInstance();
@@ -15,8 +15,12 @@ public class AnalyseTweetsWorldCup {
 
         SparkConf sparkConf = new SparkConf()
                 .setAppName("tweets worldcup")
-                .setMaster("local");
+                .setMaster("local[2]");
 
-        // ...
+        JavaStreamingContext sc = new JavaStreamingContext(sparkConf, new Duration(5000));
+
+        String[] filters = {"#Android"};
+        TwitterUtils.createStream(sc, twitterAuth, filters)
+            // ...
     }
 }
