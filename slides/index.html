@@ -4,9 +4,9 @@
     <title>Title</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style type="text/css">
-      @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
-      @import url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
-      @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url(fonts/css_family_Yanone+Kaffeesatz);
+      @import url(fonts/css_family_Droid+Serif:400,700,400italic);
+      @import url(fonts/css_family_Ubuntu+Mono:400,700,400italic);
 
       body { font-family: 'Droid Serif'; }
       h1, h2, h3 {
@@ -34,27 +34,27 @@ class: center, middle
 
 # Programme de la journée
 
-* Découvrir Spark
-* Manipuler des données
-  * Open Data - Mairie de Paris
-  * Wikipedia : page counts, articles
-* Monter un cluster en local
-* Découvrir Spark Streaming
+- Découvrir Spark
+- Manipuler des données
+  - Open Data - Mairie de Paris
+  - Wikipedia : page counts, articles
+- Monter un cluster en local
+- Découvrir Spark Streaming
 
 ---
 
 # Déroulement
 
-* 3 sprints
-* Démo + rétro à la fin de chaque sprint
-* En binômes, et on tourne
+- 3 sprints
+- Démo + rétro à la fin de chaque sprint
+- En binômes, et on tourne
 
 
-* 9h30 - 10h30 : introduction
-* 10h30 - 12h30 : Spark en local
-* 12h30 - 14h00 : pause déjeuner
-* 14h00 - 16h00 : Spark en cluster
-* 16h00 - 18h00 : Spark Streaming
+- 9h30 - 10h30 : introduction
+- 10h30 - 12h30 : Spark en local
+- 12h30 - 14h00 : pause déjeuner
+- 14h00 - 16h00 : Spark en cluster
+- 16h00 - 18h00 : Spark Streaming
 
 ---
 
@@ -62,48 +62,48 @@ class: center, middle
 
 HDFS :
 
-* Hadoop Distributed File System
-* Stockage distribué sur "commodity hardware"
-* Fault tolerant
+- Hadoop Distributed File System
+- Stockage distribué sur "commodity hardware"
+- Fault tolerant
 
 MapReduce
 
-* Framework pour traiter de larges volumes de données
-* Traitement parallèle
-* Fault tolerant
+- Framework pour traiter de larges volumes de données
+- Traitement parallèle
+- Fault tolerant
 
 ---
 
 # MapReduce
 
-* map() : découpe le problème -> distribution sur les noeuds
-* reduce() : remonte les résultats
+- map() : découpe le problème -> distribution sur les noeuds
+- reduce() : remonte les résultats
 
 <img src="images/mapreduce.png" width="80%">
 
 Manipulation de _tuples_ :
 
-* Clé - Valeur
-* Les tuples sont indépendants les uns des autres
+- Clé - Valeur
+- Les tuples sont indépendants les uns des autres
 
 ---
 
 # MapReduce - Exemples
 
-* Analyse de logs
-* Recherche distribuée (Google, avant)
-* Traitement de fichiers texte
+- Analyse de logs
+- Recherche distribuée (Google, avant)
+- Traitement de fichiers texte
 
 ---
 
 # Word count
 
-* Découpage des fichiers par fragments de 128 Mo (framework)
-* Découpage des fragments par lignes (framework)
-* Découpage des lignes en mots (map)
-* Comptage des mots (reduce)
-  * Sur chaque noeud
-  * Puis sur un noeud pour le résultat final
+- Découpage des fichiers par fragments de 128 Mo (framework)
+- Découpage des fragments par lignes (framework)
+- Découpage des lignes en mots (map)
+- Comptage des mots (reduce)
+  - Sur chaque noeud
+  - Puis sur un noeud pour le résultat final
 
 ---
 
@@ -117,8 +117,8 @@ class: full
 
 # Hadoop
 
-* Ecriture des résultats intermédiaires sur HDFS
-* Adapté aux traitements batches, pas au temps réel
+- Ecriture des résultats intermédiaires sur HDFS
+- Adapté aux traitements batches, pas au temps réel
 
 <img src="images/hadoop.png" width="100%">
 
@@ -126,9 +126,9 @@ class: full
 
 # Spark
 
-* Conserve les résultats intermédiaires en mémoire
-* Une étape peut être un _map_ seul (pas de _reduce_)
-* Peut manipuler des types simples (pas forcément que des tuples)
+- Conserve les résultats intermédiaires en mémoire
+- Une étape peut être un _map_ seul (pas de _reduce_)
+- Peut manipuler des types simples (pas forcément que des tuples)
 
 <img src="images/spark.png" width="100%">
 
@@ -138,15 +138,15 @@ class: full
 
 RDD
 
-* Resilient Distributed Dataset
-* Abstraction, collection traitée en parallèle
-* Tolérant à la panne
-* Différentes sources :
-  * Fichier sur HDFS
-  * Fichier local
-  * Collection en mémoire
-  * S3
-  * ...
+- Resilient Distributed Dataset
+- Abstraction, collection traitée en parallèle
+- Tolérant à la panne
+- Différentes sources :
+  - Fichier sur HDFS
+  - Fichier local
+  - Collection en mémoire
+  - S3
+  - ...
 
 ---
 
@@ -154,9 +154,9 @@ RDD
 
 Transformations :
 
-* Pour manipuler un RDD et retourner un autre RDD
-* Lazy !
-* Exemples :
+- Pour manipuler un RDD et retourner un autre RDD
+- Lazy !
+- Exemples :
  * _map()_ : reçoit une valeur, retourne une valeur
  * _mapToPair()_ : reçoit une valeur, retourne un tuple
  * _filter()_ : filtre les valeurs/tuples
@@ -170,8 +170,8 @@ Transformations :
 
 Actions finales :
 
-* Ne retournent pas un RDD
-* Exemples :
+- Ne retournent pas un RDD
+- Exemples :
  * _count()_ : compte les valeurs/tuples
  * _foreach()_ : exécute une fonction sur chaque valeur/tuple (utile pour le debug)
  * _saveAsHadoopFile()_ : sauve les résultats au format Hadoop
@@ -205,11 +205,11 @@ sc.textFile(".../wikipedia/pagecounts")
 
 Plusieurs options
 
-* YARN
-* Mesos
-* Standalone
-  * Workers démarrés individuellement
-  * Workers démarrés par le master
+- YARN
+- Mesos
+- Standalone
+  - Workers démarrés individuellement
+  - Workers démarrés par le master
 
 ---
 
@@ -221,22 +221,22 @@ class: center, middle
 
 # La VM
 
-* Ubuntu
-* Java 8
-* Eclipse (/home/dojo/workspace/eclipse)
-* Maven
-* Spark 1.1.0
+- Ubuntu
+- Java 8
+- Eclipse (/home/dojo/workspace/eclipse)
+- Maven
+- Spark 1.1.0
 
 
-* DOJO_HOME = /home/dojo/workspace/coding-dojo-spark/dojo-spark
-* DATA_HOME = /home/dojo/workspace/coding-dojo-spark/data
-* SPARK_HOME = /home/dojo/workspace/spark-1.1.0-bin-hadoop2.4
+- DOJO_HOME = /home/dojo/workspace/coding-dojo-spark/dojo-spark
+- DATA_HOME = /home/dojo/workspace/coding-dojo-spark/data
+- SPARK_HOME = /home/dojo/workspace/spark-1.1.0-bin-hadoop2.4
 
 
-* User : dojo/dojo
+- User : dojo/dojo
 
 
-* **Ne pas toucher la touche Ctrl droite !**
+- **Ne pas toucher la touche Ctrl droite !**
 
 ---
 
@@ -250,14 +250,14 @@ class: center, middle
 
 ## Open Data Paris - Arbres alignements
 
-* Les quelques 110 000 arbres d'alignements de Paris avec leur type et leur emplacement géographique.
-* Fichier CSV, un record par arbre.
+- Les quelques 110 000 arbres d'alignements de Paris avec leur type et leur emplacement géographique.
+- Fichier CSV, un record par arbre.
 
 **&rarr; Faire des analyses statistiques :**
 
-* Compter le nombre d'arbres par type
-* Calculer la circonférence moyenne des arbres
-* ...
+- Compter le nombre d'arbres par type
+- Calculer la circonférence moyenne des arbres
+- ...
 
 ---
 
@@ -267,14 +267,14 @@ class: center, middle
 
 Statistiques de pages vues :
 
-* par "projet Wikipedia"
-* aggrégées par heure
-* format : projet page nb_visites volume_donnees
+- par "projet Wikipedia"
+- aggrégées par heure
+- format : projet page nb_visites volume_donnees
 
 Deux datasets :
 
-* _wikipedia-pagecounts-days_ : 5 fichiers de statistiques du dimanche à minuit
-* _wikipedia-pagecounts-hours_ : les 24 fichiers d'une journée complète
+- _wikipedia-pagecounts-days_ : 5 fichiers de statistiques du dimanche à minuit
+- _wikipedia-pagecounts-hours_ : les 24 fichiers d'une journée complète
 
 Source : [Page view statistics for Wikimedia projects](https://dumps.wikimedia.org/other/pagecounts-raw/)
 
@@ -286,8 +286,8 @@ Source : [Page view statistics for Wikimedia projects](https://dumps.wikimedia.o
 
 **&rarr; Calculer le nombre de visite de la page "Coupe du Monde de Football" dans chaque pays**
 
-* _wikipedia_worldcup_pages_ : les noms des pages dans chaque langue
-* nécessité de croiser deux RDD
+- _wikipedia_worldcup_pages_ : les noms des pages dans chaque langue
+- nécessité de croiser deux RDD
 
 ---
 
@@ -299,9 +299,16 @@ class: center, middle
 
 # Mise en cluster
 
-* Cluster HDFS
-* Cluster Spark
+- Cluster HDFS
+- Cluster Spark
  * En mode standalone
+
+---
+
+# DNS... à la main
+
+- Régler le hostname de la machine
+- Editer les fichiers `/etc/hosts` de tous les noeuds
 
 ---
 
@@ -455,19 +462,11 @@ class: center, middle
 
 ---
 
-# Au choix
-
-Spark Streaming
-
-Mesos
-
----
-
 # Spark Streaming
 
-* DStream : Discretized Streams
-* Découpe un flux continu en batches
-* DStream -> séquence de RDDs
+- DStream : Discretized Streams
+- Découpe un flux continu en batches
+- DStream -> séquence de RDDs
 
 <img src="images/sparkstreaming1.png" width="100%">
 <img src="images/sparkstreaming2.png" width="100%">
@@ -478,12 +477,23 @@ Mesos
 
 Sources :
 
-* Kafka
-* Flume
-* HDFS
-* ZeroMQ
-* Twitter
-* ...
+- Kafka
+- Flume
+- HDFS
+- ZeroMQ
+- Twitter
+- ...
+
+---
+
+# Use case
+
+- Récupérer les tweets mentionnant #Android
+- Extraire les autres hashtags
+- Faire la liste des hashtags les plus utilisés toutes les 10 secondes
+- Aggréger les résultats par périodes de 30 secondes
+
+**Créer des clés d'API Twitter sur http://dev.twitter.com.**
 
 ---
 
@@ -497,8 +507,8 @@ class: center, middle
 
 ## Open Data Paris - Arbres alignements
 
-* Les quelques 110 000 arbres d'alignements de Paris avec leur type et leur emplacement géographique.
-* Fichier CSV, un record par arbre.
+- Les quelques 110 000 arbres d'alignements de Paris avec leur type et leur emplacement géographique.
+- Fichier CSV, un record par arbre.
 
 ---
 
@@ -506,8 +516,8 @@ class: center, middle
 
 ## Open Data Paris - Tonnage déchets bacs jaunes
 
-* Tableau croisé du tonnage des déchets en bacs jaunes, par arrondissement et par mois, sur l'année 2011.
-* Fichier CSV, un record par arrondissement, une colonne par mois.
+- Tableau croisé du tonnage des déchets en bacs jaunes, par arrondissement et par mois, sur l'année 2011.
+- Fichier CSV, un record par arrondissement, une colonne par mois.
 
 ---
 
@@ -517,14 +527,14 @@ class: center, middle
 
 Statistiques de pages vues :
 
-* par "projet Wikipedia"
-* aggrégées par heure
-* format : projet page nb_visites volume_donnees
+- par "projet Wikipedia"
+- aggrégées par heure
+- format : projet page nb_visites volume_donnees
 
 Deux datasets :
 
-* wikipedia-pagecounts-days : 5 fichiers de statistiques du dimanche à minuit
-* wikipedia-pagecounts-hours : les 24 fichiers d'une journée complète
+- wikipedia-pagecounts-days : 5 fichiers de statistiques du dimanche à minuit
+- wikipedia-pagecounts-hours : les 24 fichiers d'une journée complète
 
 Source : [Page view statistics for Wikimedia projects](https://dumps.wikimedia.org/other/pagecounts-raw/)
 
