@@ -1,6 +1,10 @@
 package fr.ippon.dojo.spark;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.streaming.Duration;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.twitter.TwitterUtils;
+
 import twitter4j.TwitterException;
 import twitter4j.auth.Authorization;
 import twitter4j.auth.AuthorizationFactory;
@@ -19,8 +23,12 @@ public class AnalyseTweetsAndroid {
 
         JavaStreamingContext sc = new JavaStreamingContext(sparkConf, new Duration(5000));
 
-        String[] filters = {"#Android"};
+        String[] filters = { "#Android" };
         TwitterUtils.createStream(sc, twitterAuth, filters)
-            // ...
+                // ...
+                .print();
+
+        sc.start();
+        sc.awaitTermination();
     }
 }
