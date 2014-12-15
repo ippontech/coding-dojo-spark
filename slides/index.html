@@ -340,19 +340,11 @@ Fichier hdfs-site.xml :
 </property>
 ```
 
-Fichier slaves :
-
-```
-192.168.1.10
-192.168.1.11
-...
-```
-
 ---
 
 # Cluster HDFS
 
-Formatter le file system :
+Formatter le file system (Namenode uniquement) :
 
 ```
 $ hdfs namenode -format
@@ -365,10 +357,10 @@ $ hdfs namenode
 $ hdfs datanode
 ```
 
-Lancer le cluster HDFS (namenode+datanodes) :
+Lancer les datanodes :
 
 ```
-$ $HADOOP_HOME/sbin/start-dfs.sh
+$ hdfs datanode
 ```
 
 ---
