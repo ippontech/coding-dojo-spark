@@ -14,7 +14,7 @@ public class AnalyseWikipediaWorldCup {
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         String worldcupPages = PATH + "/data/wikipedia-worldcup-pages/worldcup-pages.txt";
-        sc.textFile(worldcupPages, 10);
+        sc.textFile(worldcupPages);
         //...
 
         String worldcupViews = PATH + "/data/wikipedia-pagecounts-days/pagecounts-*";
