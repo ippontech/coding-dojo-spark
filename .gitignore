@@ -5,11 +5,4 @@
 *.iml
 target/
 
-data/paris-arbresalignementparis2010/
-data/paris-tonnagesdechets/
-data/wikipedia-articles/
-data/wikipedia-pagecounts-days/
-data/wikipedia-pagecounts-hours/
-data/wikipedia-worldcup-pages/
-data/res-worldcup-pageviews-bycountry/
-data/res-worldcup-pageviews-byviews/
+data/insee/
