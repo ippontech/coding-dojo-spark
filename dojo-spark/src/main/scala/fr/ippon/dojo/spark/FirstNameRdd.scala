@@ -22,8 +22,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 object FirstNameRdd {
 
-  //private var path: String = "/home/dojo/workspace/coding-dojo-spark/"
-  private var path: String = "/Users/thomascozien/Dev/ippon/coding-dojo-spark"
+  private var path: String = "/home/dojo/workspace/coding-dojo-spark/"
   private var filePath: String = path + "/data/insee/dpt2015.txt"
   private var separator: String = "\t";
 
@@ -43,6 +42,7 @@ object FirstNameRdd {
     // Nombre de prénoms
     val nbFirstName = rdd.filter(s => !s.startsWith("sexe"))
       .map(line => line.split(separator))
+      .filter(x => !x(1).startsWith("_"))
       .map(x => x(1))
       .distinct()
       .count()

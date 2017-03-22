@@ -1,13 +1,11 @@
 package fr.ippon.dojo.spark
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{SparkSession, functions}
 
 object FirstNameDataFrame {
 
-  //private var path: String = "/home/dojo/workspace/coding-dojo-spark/"
-  private var path: String = "/Users/thomascozien/Dev/ippon/coding-dojo-spark"
+  private var path: String = "/home/dojo/workspace/coding-dojo-spark/"
   private var filePath: String = path + "/data/insee/dpt2015.txt"
-  private var separator: String = "\t";
 
   def main(args: Array[String]) {
 
@@ -19,8 +17,22 @@ object FirstNameDataFrame {
       .getOrCreate()
 
     // Load file
-    val df = spark.read.option("header", true).option("delimiter", separator).csv(filePath)
-    df.cache();
+    val df = spark.read.option("header", true).option("delimiter", "\t").csv(filePath)
+    df.cache()
+    df.show()
+
+    // Nombre de prénoms
+    val nbFirstName = df.where(!df("preusuel").startsWith("_"))
+      .select(df("preusuel"))
+      .distinct()
+    //System.out.println("Nb FirstName : " + nbFirstName.count())
+
+    // Top 10 prénoms de l'année 2010
+    val sumFirstName = df.where(!df("preusuel").startsWith("_") && df("annais") === "2010")
+      .groupBy(df("preusuel"))
+      .agg(functions.sum(df("nombre")).as("sum"))
+    sumFirstName.sort(sumFirstName("sum").desc)
+      .show(10)
 
     spark.stop()
   }
