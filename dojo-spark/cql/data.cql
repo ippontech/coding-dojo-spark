@@ -1,9 +1,9 @@
-CREATE KEYSPACE ippon_technologies WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor' : 3};
+CREATE KEYSPACE ippon_technologies WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor' : 1};
 
 USE ippon_technologies;
 
 CREATE TABLE effectifs (
-	uid text PRIMARY KEY,
+	uuid text PRIMARY KEY,
 	rentree int,
 	rentree_univ text,
 	niveau_geo text,

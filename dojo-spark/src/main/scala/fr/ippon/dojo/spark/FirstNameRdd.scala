@@ -25,9 +25,9 @@ import org.apache.spark.{SparkConf, SparkContext}
   */
 object FirstNameRdd {
 
-  private var path: String = "/home/dojo/workspace/coding-dojo-spark/"
-  private var filePath: String = path + "/data/insee/dpt2015.txt"
-  private var separator: String = "\t";
+  val PATH: String = "/home/dojo/workspace/coding-dojo-spark/"
+  val FILE_PATH: String = PATH + "/data/insee/dpt2015.txt"
+  val SEPARATOR: String = "\t";
 
   def main(args: Array[String]) {
 
@@ -39,7 +39,7 @@ object FirstNameRdd {
     val sc = new SparkContext(conf)
 
     // Load file
-    val rdd = sc.textFile(filePath)
+    val rdd = sc.textFile(FILE_PATH)
 
     // rdd.cache()
 
@@ -48,31 +48,12 @@ object FirstNameRdd {
     //
     val nbFirstName = ???
 
-    /*
-    val nbFirstName = rdd.filter(s => !s.startsWith("sexe"))
-      .map(line => line.split(separator))
-      .filter(x => !x(1).startsWith("_"))
-      .map(x => x(1))
-      .distinct()
-     */
-
     // System.out.println("Nb FirstName : " + nbFirstName.count())
 
     //
     // Top 10 prénoms de l'année 2010
     //
     val top10FirstName = ???
-
-    /*
-    val top10FirstName = rdd.filter(s => !s.startsWith("sexe"))
-      .map(line => line.split(separator))
-      .filter(x => x(2) == "2010" && !x(1).startsWith("_"))
-      .map(x => (x(1), x(4).toFloat))
-      .reduceByKey((x, y) => x + y)
-      .sortBy(_._2, ascending = false)
-      .take(10)
-      .foreach(println)
-     */
 
     sc.stop()
   }
