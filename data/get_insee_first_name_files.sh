@@ -17,9 +17,6 @@ rm $natZip
 rm $dptZip
 
 
-dir=enseignement
-cd ..
-mkdir -p $dir 
-cd $dir 
-
-curl --compressed -O "https://data.enseignementsup-recherche.gouv.fr/explore/dataset/fr-esr-atlas_regional-effectifs-d-etudiants-inscrits/download/?format=csv&timezone=Europe/Berlin&use_labels_for_header=true"  > enseignement.csv
+# enseignement
+# https://data.enseignementsup-recherche.gouv.fr/explore/dataset/fr-esr-atlas_regional-effectifs-d-etudiants-inscrits/ 
+# https://data.enseignementsup-recherche.gouv.fr/explore/dataset/fr-esr-atlas_regional-effectifs-d-etudiants-inscrits/download/?format=csv&timezone=Europe/Berlin&use_labels_for_header=true

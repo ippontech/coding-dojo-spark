@@ -20,6 +20,9 @@ package fr.ippon.dojo.spark
 
 import org.apache.spark.{SparkConf, SparkContext}
 
+/**
+  * US#1 : Rdds
+  */
 object FirstNameRdd {
 
   private var path: String = "/home/dojo/workspace/coding-dojo-spark/"
@@ -37,19 +40,31 @@ object FirstNameRdd {
 
     // Load file
     val rdd = sc.textFile(filePath)
-    rdd.cache()
 
-    // Nombre de prénoms
+    // rdd.cache()
+
+    //
+    // Nombre de prénoms différents
+    //
+    val nbFirstName = ???
+
+    /*
     val nbFirstName = rdd.filter(s => !s.startsWith("sexe"))
       .map(line => line.split(separator))
       .filter(x => !x(1).startsWith("_"))
       .map(x => x(1))
       .distinct()
-      .count()
-    System.out.println("Nb FirstName : " + nbFirstName)
+     */
 
+    // System.out.println("Nb FirstName : " + nbFirstName.count())
+
+    // 
     // Top 10 prénoms de l'année 2010
-    val count = rdd.filter(s => !s.startsWith("sexe"))
+    //
+    val top10FirstName = ???
+
+    /*
+    val top10FirstName = rdd.filter(s => !s.startsWith("sexe"))
       .map(line => line.split(separator))
       .filter(x => x(2) == "2010" && !x(1).startsWith("_"))
       .map(x => (x(1), x(4).toFloat))
@@ -57,6 +72,7 @@ object FirstNameRdd {
       .sortBy(_._2, ascending = false)
       .take(10)
       .foreach(println)
+     */
 
     sc.stop()
   }
