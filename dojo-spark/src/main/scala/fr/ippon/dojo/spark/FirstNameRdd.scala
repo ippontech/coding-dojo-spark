@@ -58,7 +58,7 @@ object FirstNameRdd {
 
     // System.out.println("Nb FirstName : " + nbFirstName.count())
 
-    // 
+    //
     // Top 10 prénoms de l'année 2010
     //
     val top10FirstName = ???
