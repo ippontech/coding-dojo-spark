@@ -2,7 +2,8 @@ package fr.ippon.dojo.spark
 
 import java.util.UUID
 
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
 
 /**
   * US#3-4 : Cassandra
@@ -78,7 +79,15 @@ object Cassandra {
     //
     // Top 10 des regroupements des communes ayant eu le plus d'inscrits pour la rentrée 2015
     //
-    val top10 = ???
+    val nbEffectives = dfEffectives.where(dfEffectives("rentrée") === 2015)
+      .where(dfEffectives("niveau_geo") === "COMMUNE")
+      .where(dfEffectives("regroupement") =!= "TOTAL")
+      .groupBy(dfEffectives("regroupement"), dfEffectives("Identifiant de l’unité géographique"))
+      .sum("Nombre total d’étudiants inscrits").as("nbEffectives")
+
+    val top10 = nbEffectives.sort(nbEffectives("sum(Nombre total d’étudiants inscrits)").desc)
+      .limit(10)
+      .show()
 
     // Insert data cassandra
     // loadCassandraTable(spark, dfEffectives)
@@ -96,7 +105,26 @@ object Cassandra {
     //
     // Classement des regroupements par effectifs pour chaque commune ayant au moins 3 établissements
     //
-    val rankingByMunicipality = ???
+    val rankingByMunicipality = df.where(df("niveau_geo") === "Commune")
+      .where(df("regroupement") =!= "TOTAL")
+      .withColumnRenamed("nb_inscrits", "effectifs")
+    rankingByMunicipality.cache()
+
+    val rankingEffectives = rankingByMunicipality
+      .select(rankingByMunicipality("regroupement"), rankingByMunicipality("code_postal"), rankingByMunicipality("niveau_geo"), rankingByMunicipality("effectifs"))
+      .groupBy(rankingByMunicipality("regroupement"), rankingByMunicipality("code_postal"))
+      .agg(functions.sum(rankingByMunicipality("effectifs")).as("sum"))
+      .withColumn("rank", functions.row_number().over(Window.partitionBy("code_postal").orderBy(functions.desc("sum"))))
+
+    val nbLocationsByMunicipality = rankingByMunicipality
+      .select(rankingByMunicipality("regroupement"), rankingByMunicipality("code_postal"))
+      .groupBy(rankingByMunicipality("code_postal"))
+      .agg(functions.countDistinct(rankingByMunicipality("regroupement")).as("nbLocationsByMunicipality"))
+
+    val results = nbLocationsByMunicipality.where(nbLocationsByMunicipality("nbLocationsByMunicipality") >= 3)
+      .join(rankingEffectives, rankingEffectives.col("code_postal") === nbLocationsByMunicipality.col("code_postal"))
+      .show()
+
 
     //
     // Effectifs moyen par type établissement pour les communes ayant au moins un établissement public et un établissement privé
