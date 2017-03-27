@@ -3,134 +3,164 @@ package fr.ippon.dojo.spark
 import java.util.UUID
 
 import org.apache.spark.sql.expressions.Window
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{SaveMode, SparkSession}
 
 /**
-  * US#3-4 : Cassandra
+  * Exercice 3
+  * Cas d'utilisation des DataFrames / DataSets avec Cassandra sur le jeu de données des inscriptions
   */
 object Exercice3 {
 
-  val PATH: String = "/home/dojo/workspace/coding-dojo-spark/"
-  val FILE_PATH: String = PATH + "/data/enseignement/fr-esr-atlas_regional-effectifs-d-etudiants-inscrits.csv"
-  val KEYSPACE: String = "ippon_technologies"
-  val TABLE: String = "effectifs"
+  val KEYSPACE = "dojo"
+  val TABLE = "effectifs"
 
-  case class Workforce(
-                        uuid: String,
-                        rentree: Int,
-                        rentree_univ: String,
-                        niveau_geo: String,
-                        unite_geo: String,
-                        code_postal: String,
-                        regroupement_code: String,
-                        regroupement: String,
-                        secteur_code: String,
-                        secteur: String,
-                        sexe_code: Int,
-                        sexe: String,
-                        nb_inscrits: Double)
-
-  def toDouble(d: Any): Double = if (d == null) 0d else d.toString.toDouble;
-
-  def loadCassandraTable(spark: SparkSession, df: DataFrame): Unit = {
-    val writeToCassandra = spark.sqlContext.createDataFrame(df.rdd.map(row => Workforce(
-      UUID.randomUUID().toString,
-      row.getInt(0),
-      row.getString(1),
-      row.getString(2),
-      row.getString(3),
-      row.getString(20),
-      row.getString(4),
-      row.getString(5),
-      row.getString(6),
-      row.getString(7),
-      row.getInt(8),
-      row.getString(9),
-      toDouble(row.get(10))
-    ))).write
-      .format("org.apache.spark.sql.cassandra")
-      .options(Map("table" -> TABLE, "keyspace" -> KEYSPACE))
-      .mode(SaveMode.Overwrite)
-      .save()
-  }
+  val generateUUID = udf(() => UUID.randomUUID().toString)
 
   def main(args: Array[String]) {
 
     // Spark configuration
     val spark = SparkSession
       .builder
-      .appName("Dojo Spark-Cassandra [Cassandra]")
-      .master("local[*]")
+      .appName("Coding Dojo Data - Exercice 3")
+      .master("local")
       .config("spark.cassandra.connection.host", "localhost")
       .config("spark.cassandra.auth.username", "cassandra")
       .config("spark.cassandra.auth.password", "cassandra")
-      .getOrCreate()
+      .getOrCreate
 
-    // Load file
-    val dfEffectives = spark.read
+    // chargez le fichier dans un dataframe (pensez à ajouter l'option d'inférence de schéma)
+    val inscriptionsDf = spark
+      .read
       .option("header", true)
       .option("delimiter", ";")
       .option("inferSchema", "true")
-      .csv(FILE_PATH)
+      .csv("src/main/resources/data/inscriptions/inscriptions_etudiants.csv")
 
-    // dfEffectives.printSchema()
-    // dfEffectives.show()
+    // affichez le schéma
+    println("\nSchéma du DataFrame initial :")
+    inscriptionsDf.printSchema
 
-    //
-    // Top 10 des regroupements des communes ayant eu le plus d'inscrits pour la rentrée 2015
-    //
-    val nbEffectives = dfEffectives.where(dfEffectives("rentrée") === 2015)
-      .where(dfEffectives("niveau_geo") === "COMMUNE")
-      .where(dfEffectives("regroupement") =!= "TOTAL")
-      .groupBy(dfEffectives("regroupement"), dfEffectives("Identifiant de l’unité géographique"))
-      .sum("Nombre total d’étudiants inscrits").as("nbEffectives")
+    // affichez un extrait des données pour analyser le jeu de données
+    println("\nExtrait du DataFrame initial :")
+    inscriptionsDf.show
 
-    val top10 = nbEffectives.sort(nbEffectives("sum(Nombre total d’étudiants inscrits)").desc)
+    // Convertissez en booléen la colonne diffusable au moyen de la méthode when de functions)
+    // dans une nouvelle colonne
+    println("\nConversion en booléen d'une colonne :")
+    inscriptionsDf
+      .select(
+        col("diffusable")
+        , when(col("diffusable") === "oui", true).otherwise(false).as("boolean_diffusable"))
+      .distinct
+      .show
+
+    // Dans une méthode select :
+    // 1) ajouter une colonne pour l'identifiant UUID (donné)
+    // 2) renommez toutes les colonnes
+    //    pour qu'elles correspondent à votre schéma de table cassandra (utilisez la méthode col de functions)
+    val formatDf = inscriptionsDf
+      .select(
+        generateUUID() as "uuid"
+        , col("rentrée").as("rentree")
+        , col("Rentrée universitaire").as("rentree_univ")
+        , col("Niveau géographique").as("niveau_geo")
+        , col("Unité géographique").as("unite_geo")
+        , col("Identifiant de l’unité géographique").as("code_postal")
+        , col("regroupement").as("regroupement_code")
+        , col("Regroupements de formations ou d’établissements").as("regroupement")
+        , col("secteur").as("secteur_code")
+        , col("Secteur de l’établissement d’inscription").as("secteur")
+        , col("sexe").as("sexe_code")
+        , col("Sexe de l’étudiant").as("sexe")
+        , col("Nombre total d’étudiants inscrits").as("nb_inscrits"))
+
+    println("\nDataFrame formaté :")
+    formatDf.show
+
+    // écrivez votre dataframe dans la table cassandra que vous avez créé pour
+    // utilisez le save mode overwrite
+    formatDf
+//      .write
+//      .format("org.apache.spark.sql.cassandra")
+//      .options(Map("table" -> TABLE, "keyspace" -> KEYSPACE))
+//      .mode(SaveMode.Overwrite)
+//      .save
+
+    // lisez maintenant le dataframe que vous venez d'écrire
+    val cassandraDf = formatDf
+//    val cassandraDf = spark
+//      .read
+//      .format("org.apache.spark.sql.cassandra")
+//      .options(Map("table" -> TABLE, "keyspace" -> KEYSPACE))
+//      .load
+
+    // afficher son schéma
+    println("\nLe schéma du DataFrame écrit sur Cassandra")
+    cassandraDf.printSchema
+
+    // affichez les 20 premiers éléments
+    println("\nLes 20 premiers éléments du DataFrame depuis Cassandra :")
+    cassandraDf.show
+
+    // 1) trouvez le top 10 des regroupements des communes ayant eu le plus d'inscrits pour la rentrée 2015
+    // donc différents des regroupement totaux
+    // 2) ajoutez ensuite un compteur qui s'incrémente dans une nouvelle colonne (en partant de 1 et non de 0)
+    println("\nTop 10 des regroupements de communes :")
+    cassandraDf
+      .where(
+        col("rentree") === 2015
+          && col("niveau_geo") === "Commune"
+          && col("regroupement") =!= "TOTAL")
+      .groupBy(col("regroupement"), col("code_postal"))
+      .agg(sum("nb_inscrits").as("total"))
+      .sort(col("total").desc)
+      .withColumn("ranking", monotonically_increasing_id + 1)
       .limit(10)
-      .show()
+      .show
 
-    // Insert data cassandra
-    // loadCassandraTable(spark, dfEffectives)
 
-    // Read from cassandra
-    val df = spark
-      .read
-      .format("org.apache.spark.sql.cassandra")
-      .options(Map("table" -> TABLE, "keyspace" -> KEYSPACE))
-      .load()
+    // Déterminez un classement des regroupements par effectifs pour chaque commune ayant au moins 3 établissements :
+    // 1) Pour cela, restreignez les données sur les communes ne contenant pas de regroupement totaux
+    val rankingByMunicipality = cassandraDf
+      .select("regroupement", "code_postal", "niveau_geo", "nb_inscrits")
+      .where(
+        col("niveau_geo") === "Commune"
+          && col("regroupement") =!= "TOTAL")
+      .cache
 
-    // df.show()
-    // df.printSchema()
-
-    //
-    // Classement des regroupements par effectifs pour chaque commune ayant au moins 3 établissements
-    //
-    val rankingByMunicipality = df.where(df("niveau_geo") === "Commune")
-      .where(df("regroupement") =!= "TOTAL")
-      .withColumnRenamed("nb_inscrits", "effectifs")
-    rankingByMunicipality.cache()
-
+    // 2) Calculez le nombre d'inscrits totaux pour chaque regroupement et code postal
+    // 3) Ajoutez au DataFrame résultant une nouvelle colonne donnant le ranking des regroupements
+    //    pour chaque code postal en se basant sur le total d'inscriptions calculé
+    //    - créez une fenêtre glissante partitionnée par le code_postal (Object Window)
+    //    - triez cette fenêtre glissante sur les valeurs de total décroissantes
+    //    - utilisez la fonction row_number de l'Object functions sur la fenêtre glissante pour déterminer le ranking
     val rankingEffectives = rankingByMunicipality
-      .select(rankingByMunicipality("regroupement"), rankingByMunicipality("code_postal"), rankingByMunicipality("niveau_geo"), rankingByMunicipality("effectifs"))
-      .groupBy(rankingByMunicipality("regroupement"), rankingByMunicipality("code_postal"))
-      .agg(functions.sum(rankingByMunicipality("effectifs")).as("sum"))
-      .withColumn("rank", functions.row_number().over(Window.partitionBy("code_postal").orderBy(functions.desc("sum"))))
+      .groupBy("regroupement", "code_postal")
+      .agg(sum(col("nb_inscrits")).as("total"))
+      .withColumn("ranking", row_number
+        .over(Window
+          .partitionBy("code_postal")
+          .orderBy(desc("total"))))
 
+    // 4) Calculez dans un nouveau DataFrame le nombre de regroupement par code postal
+    // 5) Gardez seulement les codes postaux avec au minimum 3 regroupements
     val nbLocationsByMunicipality = rankingByMunicipality
-      .select(rankingByMunicipality("regroupement"), rankingByMunicipality("code_postal"))
-      .groupBy(rankingByMunicipality("code_postal"))
-      .agg(functions.countDistinct(rankingByMunicipality("regroupement")).as("nbLocationsByMunicipality"))
+      .groupBy("code_postal")
+      .agg(countDistinct("regroupement").as("locationsPerTown"))
+      .where(col("locationsPerTown") >= 3)
 
-    val results = nbLocationsByMunicipality.where(nbLocationsByMunicipality("nbLocationsByMunicipality") >= 3)
-      .join(rankingEffectives, rankingEffectives.col("code_postal") === nbLocationsByMunicipality.col("code_postal"))
-      .show()
+    // 6) Joignez les 2 DataFrames que vous avez créé aux étapes 3) et 5)
+    // 7) retirez une des deux colonnes ayant servi pour la jointure et affichez le résultat
+    nbLocationsByMunicipality
+      .join(rankingEffectives, nbLocationsByMunicipality("code_postal") === rankingEffectives("code_postal"))
+      .drop(rankingEffectives("code_postal"))
+      .show
 
-
-    //
+    // Optionel
     // Effectifs moyen par type établissement pour les communes ayant au moins un établissement public et un établissement privé
-    //
-    val averageEffective = ???
+//    val averageEffective = ???
 
-    spark.stop()
+    spark.stop
   }
 }
