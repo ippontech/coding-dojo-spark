@@ -8,7 +8,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession, functions}
 /**
   * US#3-4 : Cassandra
   */
-object Cassandra {
+object Exercice3 {
 
   val PATH: String = "/home/dojo/workspace/coding-dojo-spark/"
   val FILE_PATH: String = PATH + "/data/enseignement/fr-esr-atlas_regional-effectifs-d-etudiants-inscrits.csv"
