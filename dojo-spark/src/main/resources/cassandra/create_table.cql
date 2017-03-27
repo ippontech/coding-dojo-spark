@@ -16,4 +16,4 @@ CREATE TABLE effectifs (
 	sexe_code int,
 	sexe text,
 	nb_inscrits double
-	);
+);
