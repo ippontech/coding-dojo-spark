@@ -5,7 +5,7 @@ import org.apache.spark.sql.{SparkSession, functions}
 /**
   * US#2 : DataFrames
   */
-object FirstNameDataFrame {
+object Exercice2 {
 
   val PATH: String = "/home/dojo/workspace/coding-dojo-spark/"
   val FILE_PATH: String = PATH + "/data/insee/dpt2015.txt"
