@@ -81,19 +81,18 @@ object Exercice3 {
     // écrivez votre dataframe dans la table cassandra que vous avez créé pour
     // utilisez le save mode overwrite
     formatDf
-//      .write
-//      .format("org.apache.spark.sql.cassandra")
-//      .options(Map("table" -> TABLE, "keyspace" -> KEYSPACE))
-//      .mode(SaveMode.Overwrite)
-//      .save
+      .write
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map("table" -> TABLE, "keyspace" -> KEYSPACE))
+      .mode(SaveMode.Overwrite)
+      .save
 
     // lisez maintenant le dataframe que vous venez d'écrire
-    val cassandraDf = formatDf
-//    val cassandraDf = spark
-//      .read
-//      .format("org.apache.spark.sql.cassandra")
-//      .options(Map("table" -> TABLE, "keyspace" -> KEYSPACE))
-//      .load
+    val cassandraDf = spark
+      .read
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map("table" -> TABLE, "keyspace" -> KEYSPACE))
+      .load
 
     // afficher son schéma
     println("\nLe schéma du DataFrame écrit sur Cassandra")
