@@ -5,5 +5,4 @@
 *.iml
 target/
 
-data/insee/
-data/enseignement/
+dojo-spark/src/main/resources/data
