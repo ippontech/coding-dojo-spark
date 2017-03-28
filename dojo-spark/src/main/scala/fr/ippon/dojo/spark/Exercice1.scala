@@ -32,7 +32,7 @@ object Exercice1 {
     // créez un nouveau rdd en supprimant la première ligne
     // puis découpez les autres par le délimiteur
     // et appliquez votre tableau de string dans la case class que vous avez créé
-    
+
 
     // mettez ce RDD en cache
 
