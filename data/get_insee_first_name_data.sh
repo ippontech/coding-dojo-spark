@@ -2,11 +2,11 @@
 
 dir=../dojo-spark/src/main/resources/data/insee
 
-count=3405312
+count=3458709
 
 dptZip=insee_first_name_dpt.zip
-fileName=dpt2015.txt
-url="https://www.insee.fr/fr/statistiques/fichier/2540004/dpt2015_txt.zip"
+fileName=dpt2016.txt
+url=https://insee.fr/fr/statistiques/fichier/2540004/dpt2016_txt.zip
 
 mkdir -p $dir
 cd $dir
