@@ -24,7 +24,7 @@ object Exercice2 {
       .option("header", true)
       .option("delimiter", "\t")
       .option("inferSchema", "true")
-      .csv("src/main/resources/data/insee/dpt2015.txt")
+      .csv("src/main/resources/data/insee/dpt2016.txt")
       .cache
 
     // faites un comptage du nombre de ligne et affichez le dans le terminal

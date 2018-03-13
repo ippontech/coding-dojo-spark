@@ -8,7 +8,7 @@ import org.apache.spark.{SparkConf, SparkContext}
   */
 object Exercice1 {
 
-  case class Prenom(sexe: String, preusuel: String, annais: String, dpt: String, nombre: Double)
+  case class Prenom(sexe: String, preusuel: String, annais: String, dpt: String, nombre: Int)
 
   def main(args: Array[String]) {
 
@@ -21,7 +21,7 @@ object Exercice1 {
     val sc = new SparkContext(conf)
 
     // chargez le fichier dans un RDD
-    val initialFirstNameRdd = sc.textFile("src/main/resources/data/insee/dpt2015.txt")
+    val initialFirstNameRdd = sc.textFile("src/main/resources/data/insee/dpt2016.txt")
 
     // faites un comptage du nombre de ligne et affichez le dans le terminal
     println("comptage initial = " + initialFirstNameRdd.count)
@@ -39,8 +39,9 @@ object Exercice1 {
     // et appliquez votre tableau de string dans la case class que vous avez créé
     val firstNameRdd = initialFirstNameRdd
       .filter(s => !s.startsWith("sexe"))
-      .map(line => line.split("\t"))
-      .map(k => Prenom(k(0), k(1), k(2), k(3), k(4).toDouble))
+      .map(line => (line.split("\t")))
+      .filter(_.length > 1)
+      .map(k => Prenom(k.head, k(1), k(2), k(3), k.last.toInt))
 
     // mettez ce RDD en cache
     val cachedFirstNameRdd = firstNameRdd.cache
@@ -50,6 +51,7 @@ object Exercice1 {
     cachedFirstNameRdd
       .take(20)
       .foreach(println)
+
 
     // trouvez le nombre de personne qui ont le même prénom que vous
     println("\nNombre de personnes pour le nom donné : " + cachedFirstNameRdd
