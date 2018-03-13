@@ -8,7 +8,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <spark.version>2.1.0</spark.version>
+        <spark.version>2.3.0</spark.version>
         <hadoop.version>2.5.0</hadoop.version>
         <connector.version>2.0.0</connector.version>
         <scala.version>2.11</scala.version>
@@ -71,18 +71,6 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_${scala.version}</artifactId>
             <version>${spark.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.datastax.spark</groupId>
-            <artifactId>spark-cassandra-connector_${scala.version}</artifactId>
-            <version>${connector.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.datastax.cassandra</groupId>
-            <artifactId>cassandra-driver-core</artifactId>
-            <version>3.1.2</version>
         </dependency>
 
         <dependency>
