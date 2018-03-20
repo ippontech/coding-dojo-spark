@@ -14,7 +14,8 @@ object Exercice2 {
     // instanciation du Spark Session
     val spark = SparkSession
       .builder
-      .master("local")
+      .config("spark.eventLog.dir","file:/tmp/spark-events")
+      .config("spark.eventLog.enabled","true")
       .appName("Coding Dojo - Exercice 2")
       .getOrCreate
 
@@ -24,7 +25,7 @@ object Exercice2 {
       .option("header", true)
       .option("delimiter", "\t")
       .option("inferSchema", "true")
-      .csv("src/main/resources/data/insee/dpt2016.txt")
+      .csv(args(0))
       .cache
 
     // faites un comptage du nombre de ligne et affichez le dans le terminal
